@@ -4,11 +4,18 @@ import { toast } from "react-toastify";
 import Loader from "./Loader";
 import Link from "next/link";
 import Navbar from "./Navbar";
+import Category from "./Category";
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchProduct,setSearchProduct] = useState("")
+
+  const [selectedCategory, setSelectedCategory] = useState("All");
+const [categories, setCategories] = useState([]);
+
+
+
 
   useEffect(() => {
     const getProducts = async () => {
@@ -19,6 +26,8 @@ const HomePage = () => {
         });
 
         const data = await response.json();
+        const uniqueCategories = ["All", ...new Set(data.map((item) => item.category))];
+setCategories(uniqueCategories);
 
         console.log(data);
         setProducts(data);
@@ -33,14 +42,23 @@ const HomePage = () => {
   }, []);
 
 
-  const filteredProducts = products.filter((product) =>
-    product.title.toLowerCase().includes(searchProduct.toLowerCase())
-  );
+//   const filteredProducts = products.filter((product) =>
+//     product.title.toLowerCase().includes(searchProduct.toLowerCase())
+//   );
+const filteredProducts = products.filter((product) =>
+  product.title.toLowerCase().includes(searchProduct.toLowerCase()) &&
+  (selectedCategory === "All" || product.category === selectedCategory)
+);
 
   return (
     <>
     
     <Navbar handleOnChange={(e) => setSearchProduct(e.target.value)} />
+      <Category
+  categories={categories}
+  setSelectedCategory={setSelectedCategory}
+  selectedCategory={selectedCategory}
+/>
     <div className="p-4">
       {isLoading ? (
        
